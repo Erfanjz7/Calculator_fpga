@@ -46,12 +46,12 @@ always@( number1)
 
   begin 
 
-           if(zero==0) begin number=1; zero=1; end                    
+           if(zero==0) begin number=1; zero=1; end     // ==> pak nashe                 
            else begin
-             number = number * 10;
-		     number = number + number1;  
+             //number = number * 10;
+		    // number = number + number1;  
             
-           end 
+           
             //number = number11;
 /*            case(state)
 			     0: begin                          ==>>> hanooz amalgar nayomade 
@@ -67,5 +67,6 @@ always@( number1)
 			         end 
 			
 			endcase		 */
+	  end 		
       end
 endmodule
