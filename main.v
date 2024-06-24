@@ -3,7 +3,7 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 04/28/2024 09:36:33 AM
+// Create Date: 06/24/2024 11:59:11 PM
 // Design Name: 
 // Module Name: main
 // Project Name: 
@@ -21,20 +21,30 @@
 
 
 module main(
-    input [0:9]a,
-    output reg b
-    );
-    wire x = a;
-    always@(*)begin
-    if (x == 1)begin
-    b = 2;
-    end
-    
-    else
-    begin
-    b = "x";
-    end
-    
-    end
+	input clk,
+	input reset,
+	input [3:0] IO_P4_ROW,
+	input [3:0] IO_P4_COL,   //with PULLUP option,
+	output reg [3:0] number		
+);
 
+    wire [3:0] number1;
+    wire [3:0] first_number;
+    reg [3:0] state; 
+    localparam [3:0] fir=0 , sec=1 , plus=2;           ///state 
+    
+    wire [3:0] first_num;
+    wire [3:0] second_num;
+Keypad_Decoder k_d(
+  .clk(clk),.reset(reset) , .rows(IO_P4_ROW) , .columns(IO_P4_COL) , .keycode_output(number1) );
+   
+   
+    always@(*)
+            number = number1;
+            case(state)
+                fir : 
+                begin
+                if(number1 == 0) stste = fir;
+                end
+      
 endmodule
