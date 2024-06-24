@@ -25,11 +25,12 @@ module main(
 	input reset,
 	input [3:0] IO_P4_ROW,
 	input [3:0] IO_P4_COL,   //with PULLUP option,
-	output reg [3:0] number
+	output reg [31:0] number
 );
 
     wire [3:0] number1;
-    reg [3:0] number11=1'b000;
+    reg number11= 0;
+    integer zero = 0;
     
     reg [3:0] state =0; 
     localparam [3:0] fir=0 , sec=1 , plus=2;           ///state 
@@ -41,22 +42,24 @@ module main(
 Keypad_Decoder k_d(
   .clk(clk),.reset(reset) , .rows(IO_P4_ROW) , .columns(IO_P4_COL) , .keycode_output(number1) );
    
-always@(*)
+always@( number1)
 
   begin 
-           if(number11== 1'bx) number=10;
-           if(number11==1'b000) number=10;
-             number11 = number11 *10;
-			 number11 = number11 + number1;
-             number = number11;  
-             // number = number1;
+
+           if(zero==0) begin number=1; zero=1; end                    
+           else begin
+             number = number * 10;
+		     number = number + number1;  
+            
+           end 
+            //number = number11;
 /*            case(state)
-			     0: begin
-			         if(number1== 4'he )  state  <= 1;
-			         else if(number1== 4'hA )  state  <= 1;
-			         else if(number1== 4'hB )  state  <= 1;
-			         else if(number1== 4'hC )  state  <= 1;
-			         else if(number1== 4'hD )  state  <= 1;
+			     0: begin                          ==>>> hanooz amalgar nayomade 
+			         if(number1== 4'he )  state  <= jam ;
+			         else if(number1== 4'hA )  state  <= zarb ;
+			         else if(number1== 4'hB )  state  <= taghsin;
+			         else if(number1== 4'hC )  state  <= menha;
+			         else if(number1== 4'hD )  state  <=  nemidonam alan;
 			         else begin
 			               number = number *10;
 			               number = number + number1;
