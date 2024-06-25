@@ -31,7 +31,7 @@ module main(
                 // Only process the new input when temp changes
                 case(state)
                     0: begin
-                        if      (temp == 4'hA)begin
+                        if(temp == 4'hA)begin
                          state <= 1;  // Addition
                          last_temp <= 4'hF;
                          end
@@ -55,8 +55,10 @@ module main(
                          state <= 6;  // Unknown operation
                          last_temp <= 4'hF;
                          end
-                        else answer <= answer * 10 + temp;
-                        last_temp <= temp; 
+                        else begin 
+                        answer <= answer * 10 + temp;
+                        last_temp = temp; 
+                        end
                     end
                     
                     1: begin
@@ -99,7 +101,7 @@ module main(
                          temp != 4'hE && temp != 4'hF) begin
                             answer <= temp;
                             state <= 0;
-                            last_temp <= temp;
+                            last_temp = temp;
                         end
                     end
                     default: begin
