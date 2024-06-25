@@ -1,114 +1,111 @@
 module main(
-    input clk,
-    input reset,
-    input [3:0] IO_P4_ROW,
-    input [3:0] IO_P4_COL,   // with PULLUP option,
-    output reg [31:0] answer
+input clk,
+input reset,
+input [3:0] IO_P4_ROW,
+input [3:0] IO_P4_COL, // with PULLUP option,
+output reg [31:0] answer,
+output reg [31:0] first_num,
+output reg [31:0] second_num,
+output reg [31:0] op 
 );
 
-    wire [3:0] temp;
-    reg [3:0] last_temp;
-    reg [31:0] lastNumber;
-    reg [3:0] state; 
+localparam [3:0] Add = 4'hA , Sub = 4'hB ,
+Div = 4'hC , Mult = 4'hD ,
+equal = 4'hE , Clr = 4'hF ;
 
-    // Instantiate the Keypad Decoder
-    Keypad_Decoder k_d (
-        .clk(clk),
-        .reset(reset),
-        .rows(IO_P4_ROW),
-        .columns(IO_P4_COL),
-        .keycode_output(temp)
-    );
+wire [3:0] key_num;
+reg [3:0] last_temp;
+reg [31:0] lastNumber;
+reg [3:0] state; 
+/*
+reg [31:0] first_num;
+reg [31:0] second_num;
+reg [3:0] op; */
 
-    always @(posedge clk) begin
-        if (reset) begin
-            answer <= 0;
-            lastNumber <= 0;
-            state <= 0;
-            last_temp <= 4'hF; // Initialize last_temp to an invalid keycode
-        end else begin
-            if (temp != last_temp) begin
-                // Only process the new input when temp changes
-                case(state)
-                    0: begin
-                        if(temp == 4'hA)begin
-                         state <= 1;  // Addition
-                         last_temp <= 4'hF;
-                         end
-                        else if (temp == 4'hB)begin
-                         state <= 2;  // Subtraction
-                         last_temp <= 4'hF;
-                         end
-                        else if (temp == 4'hC)begin
-                         state <= 3;  // Division
-                         last_temp <= 4'hF;
-                         end
-                        else if (temp == 4'hD)begin
-                         state <= 4;  // Multiplication
-                         last_temp <= 4'hF;
-                         end
-                        else if (temp == 4'hE)begin
-                         state <= 5;  // Unknown operation
-                         last_temp <= 4'hF;
-                         end
-                        else if (temp == 4'hF)begin
-                         state <= 6;  // Unknown operation
-                         last_temp <= 4'hF;
-                         end
-                        else begin 
-                        answer <= answer * 10 + temp;
-                        last_temp = temp; 
-                        end
-                    end
+// Instantiate the Keypad Decoder
+Keypad_Decoder k_d(
+    .clk(clk),
+    .reset(reset),
+    .rows(IO_P4_ROW),
+    .columns(IO_P4_COL),
+    .keycode_output(key_num)
+);
+
+
+always @(posedge clk) begin
+    if (reset) begin
+        answer <= 0;
+        lastNumber <= 0;
+        state <= 0;
+        last_temp <= 4'hF; // Initialize last_temp to an invalid keycode
+        op = 0;            // newwwwwwwww
+        first_num =0;
+        second_num = 0;
+        
+    end 
+    else begin
+    
+        if (key_num != last_temp) begin
+            case(state)
+                0: begin                                   /// state 0 => first number
+                    if(key_num == Add || key_num == Sub || key_num == Div || key_num == Mult )begin
+                     state <= 1;  // ==> second number
+                     last_temp = key_num;
+                     op = key_num; //==> save op
                     
-                    1: begin
-                        answer <= lastNumber + answer;
-                        lastNumber <= answer;
-                        state <= 7;
+                     end
+                   
+                    else begin
+                        first_num = first_num * 10 + key_num;
+                        last_temp = key_num; 
                     end
-                    2: begin
-                        answer <= lastNumber - answer;
-                        lastNumber <= answer;
-                        state <= 7;
-
+                end
+                
+                1: begin                                   /// state 1 => second number
+                    if(key_num == equal )
+                    begin
+                     state <= 2;  // ==> calculate result
+                     last_temp = 4'hF;
                     end
-                    3: begin
-                        if (answer != 0) begin
-                            answer <= lastNumber / answer;
-                        end else begin
-                            answer <= 32'hFFFFFFFF;  // Division by zero error
-                        end
-                        lastNumber <= answer;
-                        state <= 7;
-
-                    end
-                    4: begin
-                        answer <= lastNumber * answer;
-                        lastNumber <= answer;
-                        state <= 7;
-                    end
-                    5: begin
-                        // Unknown operation
-                        state <= 0;
-                        answer<=0;
-                    end
-                    6:begin
-
-                    end
-                    7:begin
-                    //display answer
-                        if(temp != 4'hA && temp != 4'hB && temp != 4'hC && temp != 4'hD &&
-                         temp != 4'hE && temp != 4'hF) begin
-                            answer <= temp;
-                            state <= 0;
-                            last_temp = temp;
-                        end
-                    end
-                    default: begin
-                        state <= 0;
-                    end
-                endcase
-            end
+                                          
+                    else if(key_num == Add || key_num == Sub || key_num == Div || key_num == Mult)
+                    begin
+                        state <= 3;
+                    end  
+                   
+                   else
+                    begin
+                        second_num <= second_num * 10 + key_num;
+                        last_temp <= key_num; 
+                    end   
+                end
+                
+                3: begin
+                        /*first_num =0;  
+                        second_num=0;
+                        op = 0;
+                        answer = 0;*/
+                        if(op==Add) begin first_num = first_num + second_num ; end
+                        else if(op==Div) begin first_num = first_num / second_num ; end
+                        else if(op==Mult) begin first_num = first_num * second_num ; end
+                        else if(op==Sub) begin first_num = first_num - second_num ; end
+                        op <= key_num;
+                        second_num = 0;
+                        state = 1; 
+                end
+                
+                2: begin
+                   if(op==Add) begin answer = first_num + second_num ; end
+                   else if(op==Div) begin answer = first_num / second_num ; end
+                   else if(op==Mult) begin answer = first_num * second_num ; end
+                   else if(op==Sub) begin answer = first_num - second_num ; end
+                   last_temp = key_num;
+                   state <= 0; 
+                end           
+            endcase
+           
+          end
         end
-    end
+end
 endmodule
+              

@@ -3,10 +3,10 @@
 /*
 -- 16 digit keypad encoder module
 -- 
--- 1 2 3 A
--- 4 5 6 B
--- 7 8 9 C
--- * 0 # D	
+-- 1 2 3 +
+-- 4 5 6 -
+-- 7 8 9 *
+-- = 0 R /	
 
 -- let's treat special characters: 
 -- * = 0xE and # = 0xF
@@ -24,12 +24,14 @@ module Keypad_Decoder(
 
 localparam [3:0] 
 	unknown = 4'bxxxx,
-	none = 3'b0000,
-	one = 4'd1,
-	two = 4'd2,
-	three = 4'd3,
-	four = 4'd4;
-	
+	none = 4'b0000,
+	one = 4'b0001,
+	two = 4'b0010,
+	three = 4'b0100,
+	four = 4'b1000;
+
+integer count=0;
+
 always @(posedge clk) begin
 	if(reset) begin
 		keycode_output <= unknown;
@@ -40,7 +42,7 @@ always @(posedge clk) begin
 					one: keycode_output   <= 4'h1;
 					two: keycode_output   <= 4'h4;
 					three: keycode_output <= 4'h7;
-					four: keycode_output  <= 4'hE;
+					four: keycode_output  <= 4'he;
 					default: keycode_output <= unknown;
 				endcase
 			two:
@@ -56,15 +58,15 @@ always @(posedge clk) begin
 					one: keycode_output   <= 4'h3;
 					two: keycode_output   <= 4'h6;
 					three: keycode_output <= 4'h9;
-					four: keycode_output  <= 4'hF;
+					four: keycode_output  <= 4'hf;
 					default: keycode_output <= unknown;
 				endcase
 			four:
 				case(rows)
-					one: keycode_output   <= 4'hA;
-					two: keycode_output   <= 4'hB;
-					three: keycode_output <= 4'hC;
-					four: keycode_output  <= 4'hD;
+					one: keycode_output   <= 4'ha;
+					two: keycode_output   <= 4'hb;
+					three: keycode_output <= 4'hc;
+					four: keycode_output  <= 4'hd;
 					default: keycode_output <= unknown;
 				endcase
 			default: 
