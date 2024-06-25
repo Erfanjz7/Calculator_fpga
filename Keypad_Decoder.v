@@ -24,11 +24,11 @@ module Keypad_Decoder(
 
 localparam [3:0] 
 	unknown = 4'bxxxx,
-	none = 4'b0000,
-	one = 4'b0001,
-	two = 4'b0010,
-	three = 4'b0100,
-	four = 4'b1000;
+	none = 3'b0000,
+	one = 4'd1,
+	two = 4'd2,
+	three = 4'd3,
+	four = 4'd4;
 	
 always @(posedge clk) begin
 	if(reset) begin
@@ -40,7 +40,7 @@ always @(posedge clk) begin
 					one: keycode_output   <= 4'h1;
 					two: keycode_output   <= 4'h4;
 					three: keycode_output <= 4'h7;
-					four: keycode_output  <= 4'he;
+					four: keycode_output  <= 4'hE;
 					default: keycode_output <= unknown;
 				endcase
 			two:
@@ -56,15 +56,15 @@ always @(posedge clk) begin
 					one: keycode_output   <= 4'h3;
 					two: keycode_output   <= 4'h6;
 					three: keycode_output <= 4'h9;
-					four: keycode_output  <= 4'hf;
+					four: keycode_output  <= 4'hF;
 					default: keycode_output <= unknown;
 				endcase
 			four:
 				case(rows)
-					one: keycode_output   <= 4'ha;
-					two: keycode_output   <= 4'hb;
-					three: keycode_output <= 4'hc;
-					four: keycode_output  <= 4'hd;
+					one: keycode_output   <= 4'hA;
+					two: keycode_output   <= 4'hB;
+					three: keycode_output <= 4'hC;
+					four: keycode_output  <= 4'hD;
 					default: keycode_output <= unknown;
 				endcase
 			default: 
